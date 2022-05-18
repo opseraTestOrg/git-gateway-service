@@ -56,7 +56,8 @@ public class GithubActionsServiceImpl implements IGitActionsService {
             Configuration config = configCollector.getToolConfigurationDetails(request);
             String readURL = gitHelper.getURL(request.getService()) + CREATE_TAG_REQUEST;
             GitIntegratorRequest gitIntegratorRequest = gitHelper.createRequestData(request,config);
-            gitIntegratorRequest.setTagName("gateway-tag");//to-do
+            String tagName = gitHelper.getTagName(config, request.getRunCount().toString());
+            gitIntegratorRequest.setTagName(tagName);
             GitIntegratorResponse gitResponse = gitHelper.processGitAction(readURL, gitIntegratorRequest);
             gitGatewayResponse.setStatus("SUCCESS");
             gitGatewayResponse.setMessage("Tag request successfully created");

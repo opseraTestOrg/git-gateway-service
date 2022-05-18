@@ -4,10 +4,9 @@
 package com.opsera.service.gitgateway.resources;
 
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * @author Hemadri
@@ -24,4 +23,8 @@ public class Configuration implements Serializable {
     private String gitBranch;
     private String targetBranch;
     private String workspace;
+    private boolean dynamicTag;
+    private List<String> tagType;
+    private String dynamicTagName;
+    private String tagName;
 }
