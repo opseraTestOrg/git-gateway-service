@@ -13,4 +13,5 @@ public class GitIntegratorRequest {
     private String gitBranch;
     private String targetBranch;
     private String tagName;
+    private String workspace;
 }

@@ -23,4 +23,5 @@ public class Configuration implements Serializable {
     private String repository;
     private String gitBranch;
     private String targetBranch;
+    private String workspace;
 }
