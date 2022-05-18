@@ -40,7 +40,7 @@ public class GitGatewayController {
     }
     @GetMapping("/step/status")
     @ApiOperation("To create tag request")
-    public ResponseEntity<GitGatewayResponse> processCreateTagRequest(){
+    public ResponseEntity<GitGatewayResponse> stepStatus(){
         GitGatewayResponse gitGatewayResponse=new GitGatewayResponse();
         gitGatewayResponse.setStatus("SUCCESS");
         gitGatewayResponse.setMessage("Step completed successfully");
