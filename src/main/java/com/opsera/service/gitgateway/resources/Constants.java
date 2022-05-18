@@ -11,6 +11,7 @@ public class Constants {
     public static final String TAG = "add-tag";
     public static final String CREATE_PULL_REQUEST = "/pullRequest";
     public static final String CREATE_TAG_REQUEST = "/tag";
+    public static final String TOOLS_CONFIG_URL = "/tools/configuration";
     public static final String OPSERA_PIPELINE_GITACTIONS_REQUEST = "";
 
 

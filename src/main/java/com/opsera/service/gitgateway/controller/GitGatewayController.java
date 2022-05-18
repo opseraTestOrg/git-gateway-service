@@ -4,6 +4,7 @@ import com.opsera.service.gitgateway.config.GitGatewayTypeFactory;
 import com.opsera.service.gitgateway.resources.GitGatewayRequest;
 import com.opsera.service.gitgateway.resources.GitGatewayResponse;
 import io.swagger.annotations.ApiOperation;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@Slf4j
 public class GitGatewayController {
     @Autowired
     private GitGatewayTypeFactory gitGatewayTypeFactory;
@@ -25,6 +27,7 @@ public class GitGatewayController {
     @PostMapping("/api/git/pullRequest")
     @ApiOperation("To create pull request")
     public ResponseEntity<GitGatewayResponse> processCreatePullRequest(@RequestBody GitGatewayRequest request){
+        log.info("Received request to create Pull request {}",request);
         GitGatewayResponse response = gitGatewayTypeFactory.getGitType(request.getService()).createPullRequest(request);
         return ResponseEntity.ok(response);
     }

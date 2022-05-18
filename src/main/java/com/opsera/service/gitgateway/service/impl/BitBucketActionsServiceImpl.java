@@ -3,8 +3,12 @@ package com.opsera.service.gitgateway.service.impl;
 import static com.opsera.service.gitgateway.resources.Constants.CREATE_PULL_REQUEST;
 import static com.opsera.service.gitgateway.resources.Constants.CREATE_TAG_REQUEST;
 import com.opsera.core.rest.RestTemplateHelper;
+import com.opsera.service.gitgateway.resources.Configuration;
 import com.opsera.service.gitgateway.resources.GitGatewayRequest;
 import com.opsera.service.gitgateway.resources.GitGatewayResponse;
+import com.opsera.service.gitgateway.resources.GitIntegratorRequest;
+import com.opsera.service.gitgateway.resources.GitIntegratorResponse;
+import com.opsera.service.gitgateway.service.ConfigCollector;
 import com.opsera.service.gitgateway.service.GitHelper;
 import com.opsera.service.gitgateway.service.IGitActionsService;
 import lombok.extern.slf4j.Slf4j;
@@ -22,33 +26,45 @@ public class BitBucketActionsServiceImpl implements IGitActionsService {
     private GitHelper gitHelper;
     @Autowired
     private RestTemplateHelper restTemplateHelper;
+    @Autowired
+    private ConfigCollector configCollector;
+
     public GitGatewayResponse createPullRequest(GitGatewayRequest request) {
         log.info("Request to create Pull request : {} ", request);
-        String readURL = gitHelper.getURL(request.getService()) + CREATE_PULL_REQUEST;
+        GitGatewayResponse gitGatewayResponse = new GitGatewayResponse();
         try {
-            restTemplateHelper.postForEntity(String.class, readURL, request);
+            Configuration config = configCollector.getToolConfigurationDetails(request);
+            String readURL = gitHelper.getURL(request.getService()) + CREATE_PULL_REQUEST;
+            GitIntegratorRequest gitIntegratorRequest = gitHelper.createRequestData(request,config);
+            GitIntegratorResponse gitResponse = gitHelper.processGitAction(readURL, gitIntegratorRequest);
+            gitGatewayResponse.setStatus("SUCCESS");
+            gitGatewayResponse.setMessage("Pull request successfully created");
         } catch (IOException e) {
-            e.printStackTrace();
+            gitGatewayResponse.setStatus("Failed");
+            gitGatewayResponse.setMessage("Pull request failed");
+            log.error("Pull request failed",e);
         }
-        GitGatewayResponse gitGatewayResponse=new GitGatewayResponse();
-        gitGatewayResponse.setStatus("SUCCESS");
-        gitGatewayResponse.setMessage("Pull request successfully created");
         return gitGatewayResponse;
-
     }
 
     @Override
     public GitGatewayResponse createTag(GitGatewayRequest request) {
         log.info("Request to create tag request : {} ", request);
-        String readURL = gitHelper.getURL(request.getService()) + CREATE_TAG_REQUEST;
+        GitGatewayResponse gitGatewayResponse = new GitGatewayResponse();
         try {
-            restTemplateHelper.postForEntity(String.class, readURL, request);
+            Configuration config = configCollector.getToolConfigurationDetails(request);
+            String readURL = gitHelper.getURL(request.getService()) + CREATE_TAG_REQUEST;
+            GitIntegratorRequest gitIntegratorRequest = gitHelper.createRequestData(request,config);
+            gitIntegratorRequest.setTagName("gateway-tag");//to-do
+            GitIntegratorResponse gitResponse = gitHelper.processGitAction(readURL, gitIntegratorRequest);
+            gitGatewayResponse.setStatus("SUCCESS");
+            gitGatewayResponse.setMessage("Tag request successfully created");
         } catch (IOException e) {
-            e.printStackTrace();
+            gitGatewayResponse.setStatus("Failed");
+            gitGatewayResponse.setMessage("Tag request failed");
+            log.error("Tag request failed",e);
+
         }
-        GitGatewayResponse gitGatewayResponse=new GitGatewayResponse();
-        gitGatewayResponse.setStatus("SUCCESS");
-        gitGatewayResponse.setMessage("tag request successfully created");
         return gitGatewayResponse;
     }
 }

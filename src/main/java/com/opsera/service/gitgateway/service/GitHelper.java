@@ -8,8 +8,11 @@ import static com.opsera.service.gitgateway.resources.Constants.GITLAB;
 
 import com.opsera.core.rest.RestTemplateHelper;
 import com.opsera.service.gitgateway.config.AppConfig;
+import com.opsera.service.gitgateway.resources.Configuration;
 import com.opsera.service.gitgateway.resources.GitGatewayRequest;
 
+import com.opsera.service.gitgateway.resources.GitIntegratorRequest;
+import com.opsera.service.gitgateway.resources.GitIntegratorResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +35,8 @@ public class GitHelper {
 
     @Autowired
     private AppConfig appConfig;
+    @Autowired
+    private ConfigCollector configCollector;
 
 
     public String getURL(String serviceType) {
@@ -56,9 +61,19 @@ public class GitHelper {
         return url;
     }
 
-    public String createPullRequest(GitGatewayRequest request) throws IOException {
-        LOGGER.info("Request to create Pull request : {} ", request);
-        String readURL = getURL(request.getService()) + CREATE_PULL_REQUEST;
-        return restTemplateHelper.postForEntity(String.class, readURL, request);
+    public GitIntegratorRequest createRequestData(GitGatewayRequest request, Configuration config) throws IOException {
+        GitIntegratorRequest gitIntegratorRequest= GitIntegratorRequest.builder()
+                .gitToolId(config.getGitToolId())
+                .customerId(request.getCustomerId())
+                .gitBranch(config.getGitBranch())
+                .targetBranch(config.getTargetBranch())
+                .projectId(config.getProjectId())
+                .build();
+        return gitIntegratorRequest;
+
+    }
+    public GitIntegratorResponse processGitAction(String readURL,GitIntegratorRequest gitIntegratorRequest) throws IOException {
+        return restTemplateHelper.postForEntity(GitIntegratorResponse.class, readURL, gitIntegratorRequest);
+
     }
 }
