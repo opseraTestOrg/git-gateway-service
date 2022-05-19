@@ -35,6 +35,7 @@ public class GitGatewayController {
     @PostMapping("/tag")
     @ApiOperation("To create tag request")
     public ResponseEntity<GitGatewayResponse> processCreateTagRequest(@RequestBody GitGatewayRequest request){
+        log.info("Received request to create Pull request {}",request);
         GitGatewayResponse response = gitGatewayTypeFactory.getGitType(request.getService()).createTag(request);
         return ResponseEntity.ok(response);
     }
@@ -42,7 +43,7 @@ public class GitGatewayController {
     @ApiOperation("To create tag request")
     public ResponseEntity<GitGatewayResponse> stepStatus(){
         GitGatewayResponse gitGatewayResponse=new GitGatewayResponse();
-        gitGatewayResponse.setStatus("SUCCESS");
+        gitGatewayResponse.setStatus("Success");
         gitGatewayResponse.setMessage("Step completed successfully");
         return ResponseEntity.ok(gitGatewayResponse);
     }

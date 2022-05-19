@@ -18,6 +18,10 @@ public class Constants {
     public static final String OTHER = "other";
     public static final String YYYY_MM_DD = "yyyyMMdd";
     public static final String YYYY_MM_DD_HH_MM_SS = "yyyyMMddHHmmss";
+    public static final String FAILED = "Failed";
+    public static final String SUCCESS = "Success";
+    public static final String IN_PROGRESS = "In Progress";
+
     public static final String OPSERA_PIPELINE_GITACTIONS_REQUEST = "";
 
 
