@@ -1,5 +1,6 @@
 package com.opsera.service.gitgateway.controller;
 
+import com.opsera.core.aspects.TrackExecutionTime;
 import com.opsera.service.gitgateway.config.GitGatewayTypeFactory;
 import com.opsera.service.gitgateway.resources.GitGatewayRequest;
 import com.opsera.service.gitgateway.resources.GitGatewayResponse;
@@ -20,12 +21,14 @@ public class GitGatewayController {
 
     @GetMapping("/status")
     @ApiOperation("To check the service status")
+    @TrackExecutionTime
     public String status() {
         return "Git Gateway Service running";
     }
 
     @PostMapping("/pullRequest")
     @ApiOperation("To create pull request")
+    @TrackExecutionTime
     public ResponseEntity<GitGatewayResponse> processCreatePullRequest(@RequestBody GitGatewayRequest request){
         log.info("Received request to create Pull request {}",request);
         GitGatewayResponse response = gitGatewayTypeFactory.getGitType(request.getService()).createPullRequest(request);
@@ -34,6 +37,7 @@ public class GitGatewayController {
 
     @PostMapping("/tag")
     @ApiOperation("To create tag request")
+    @TrackExecutionTime
     public ResponseEntity<GitGatewayResponse> processCreateTagRequest(@RequestBody GitGatewayRequest request){
         log.info("Received request to create Pull request {}",request);
         GitGatewayResponse response = gitGatewayTypeFactory.getGitType(request.getService()).createTag(request);
@@ -41,6 +45,7 @@ public class GitGatewayController {
     }
     @GetMapping("/step/status")
     @ApiOperation("To create tag request")
+    @TrackExecutionTime
     public ResponseEntity<GitGatewayResponse> stepStatus(){
         GitGatewayResponse gitGatewayResponse=new GitGatewayResponse();
         gitGatewayResponse.setStatus("Success");
