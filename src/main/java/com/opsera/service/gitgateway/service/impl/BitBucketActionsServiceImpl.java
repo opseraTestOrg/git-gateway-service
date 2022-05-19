@@ -52,6 +52,7 @@ public class BitBucketActionsServiceImpl implements IGitActionsService {
             GitIntegratorResponse gitResponse = gitHelper.processGitAction(readURL, gitIntegratorRequest);
             gitGatewayResponse.setStatus(SUCCESS);
             gitGatewayResponse.setMessage("pull request successfully created : "+gitResponse.getPullRequestLink());
+            gitGatewayResponse.setPullRequestLink(gitResponse.getPullRequestLink());
             gitGatewayUtil.writeToResponseTopic(gitGatewayResponse);
         } catch (Exception e) {
             gitGatewayResponse.setStatus(FAILED);
@@ -84,6 +85,7 @@ public class BitBucketActionsServiceImpl implements IGitActionsService {
             GitIntegratorResponse gitResponse = gitHelper.processGitAction(readURL, gitIntegratorRequest);
             gitGatewayResponse.setStatus(SUCCESS);
             gitGatewayResponse.setMessage("Tag request successfully created with tag name : "+tagName);
+            gitGatewayResponse.setTagName(tagName);
             gitGatewayUtil.writeToResponseTopic(gitGatewayResponse);
         } catch (IOException e) {
             gitGatewayResponse.setStatus(FAILED);

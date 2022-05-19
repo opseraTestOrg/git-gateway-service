@@ -1,8 +1,10 @@
 package com.opsera.service.gitgateway.resources;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
 @Data
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class GitGatewayResponse {
     private String customerId;
     private String pipelineId;
