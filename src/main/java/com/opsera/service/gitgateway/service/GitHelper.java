@@ -2,22 +2,30 @@ package com.opsera.service.gitgateway.service;
 
 
 import static com.opsera.service.gitgateway.resources.Constants.BITBUCKET;
+import static com.opsera.service.gitgateway.resources.Constants.CREATE_PULL_REQUEST;
+import static com.opsera.service.gitgateway.resources.Constants.CREATE_TAG_REQUEST;
 import static com.opsera.service.gitgateway.resources.Constants.DATE;
+import static com.opsera.service.gitgateway.resources.Constants.FAILED;
 import static com.opsera.service.gitgateway.resources.Constants.GITHUB;
 import static com.opsera.service.gitgateway.resources.Constants.GITLAB;
+import static com.opsera.service.gitgateway.resources.Constants.IN_PROGRESS;
 import static com.opsera.service.gitgateway.resources.Constants.OTHER;
 import static com.opsera.service.gitgateway.resources.Constants.RUN_COUNT;
+import static com.opsera.service.gitgateway.resources.Constants.SUCCESS;
 import static com.opsera.service.gitgateway.resources.Constants.TIMESTAMP;
 import static com.opsera.service.gitgateway.resources.Constants.YYYY_MM_DD;
 import static com.opsera.service.gitgateway.resources.Constants.YYYY_MM_DD_HH_MM_SS;
 
+import com.opsera.core.exception.ServiceException;
 import com.opsera.core.rest.RestTemplateHelper;
 import com.opsera.service.gitgateway.config.AppConfig;
 import com.opsera.service.gitgateway.resources.Configuration;
 import com.opsera.service.gitgateway.resources.GitGatewayRequest;
 
+import com.opsera.service.gitgateway.resources.GitGatewayResponse;
 import com.opsera.service.gitgateway.resources.GitIntegratorRequest;
 import com.opsera.service.gitgateway.resources.GitIntegratorResponse;
+import com.opsera.service.gitgateway.util.GitGatewayUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -107,4 +115,69 @@ public class GitHelper {
         }
         return tagName;
     }
+
+    @Autowired
+    private GitGatewayUtil gitGatewayUtil;
+
+    public GitGatewayResponse getGitGatewayResponseForTag(GitGatewayRequest request) {
+        GitGatewayResponse gitGatewayResponse = new GitGatewayResponse();
+        gitGatewayResponse.setCustomerId(request.getCustomerId());
+        gitGatewayResponse.setPipelineId(request.getPipelineId());
+        gitGatewayResponse.setRunCount(request.getRunCount());
+        gitGatewayResponse.setStatus(IN_PROGRESS);
+        gitGatewayResponse.setStatus("Create Tag request in Progress");
+        gitGatewayUtil.writeToResponseTopic(gitGatewayResponse);
+        try {
+            Configuration config = configCollector.getToolConfigurationDetails(request);
+            String readURL = getURL(request.getService()) + CREATE_TAG_REQUEST;
+            GitIntegratorRequest gitIntegratorRequest = createRequestData(request,config);
+            String tagName = getTagName(config, request.getRunCount().toString());
+            gitIntegratorRequest.setTagName(tagName);
+            GitIntegratorResponse gitResponse = processGitAction(readURL, gitIntegratorRequest);
+            gitGatewayResponse.setStatus(SUCCESS);
+            gitGatewayResponse.setMessage("Tag request successfully created with tag name : "+tagName);
+            gitGatewayResponse.setTagName(tagName);
+            gitGatewayUtil.writeToResponseTopic(gitGatewayResponse);
+        } catch (IOException e) {
+            gitGatewayResponse.setStatus(FAILED);
+            gitGatewayResponse.setMessage("tag creation request failed");
+            log.error("tag creation request failed due to",e.getMessage());
+            gitGatewayUtil.writeToLogTopic(gitGatewayResponse);
+            gitGatewayUtil.writeToResponseTopic(gitGatewayResponse);
+            String errorMsg = new StringBuilder("Error while creating tag  ").append(" Error : ").append(e.getMessage()).toString();
+            throw new ServiceException(errorMsg);
+
+        }
+        return gitGatewayResponse;
+    }
+
+    public GitGatewayResponse getGitGatewayResponseForPull(GitGatewayRequest request) {
+        GitGatewayResponse gitGatewayResponse = new GitGatewayResponse();
+        gitGatewayResponse.setCustomerId(request.getCustomerId());
+        gitGatewayResponse.setPipelineId(request.getPipelineId());
+        gitGatewayResponse.setRunCount(request.getRunCount());
+        gitGatewayResponse.setStatus(IN_PROGRESS);
+        gitGatewayResponse.setStatus("Create pull request in Progress");
+        gitGatewayUtil.writeToResponseTopic(gitGatewayResponse);
+        try {
+            Configuration config = configCollector.getToolConfigurationDetails(request);
+            String readURL = getURL(request.getService()) + CREATE_PULL_REQUEST;
+            GitIntegratorRequest gitIntegratorRequest = createRequestData(request,config);
+            GitIntegratorResponse gitResponse = processGitAction(readURL, gitIntegratorRequest);
+            gitGatewayResponse.setStatus(SUCCESS);
+            gitGatewayResponse.setMessage("pull request successfully created : "+gitResponse.getPullRequestLink());
+            gitGatewayResponse.setPullRequestLink(gitResponse.getPullRequestLink());
+            gitGatewayUtil.writeToResponseTopic(gitGatewayResponse);
+        } catch (Exception e) {
+            gitGatewayResponse.setStatus(FAILED);
+            gitGatewayResponse.setMessage("Pull request creation failed");
+            log.error("Pull request failed",e.getMessage());
+            gitGatewayUtil.writeToLogTopic(gitGatewayResponse);
+            gitGatewayUtil.writeToResponseTopic(gitGatewayResponse);
+            String errorMsg = new StringBuilder("Error while creating pull ").append(" Error : ").append(e.getMessage()).toString();
+            throw new ServiceException(errorMsg);
+        }
+        return gitGatewayResponse;
+    }
+
 }
