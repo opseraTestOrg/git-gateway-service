@@ -135,7 +135,8 @@ public class GitHelper {
             gitIntegratorRequest.setTagName(tagName);
             GitIntegratorResponse gitResponse = processGitAction(readURL, gitIntegratorRequest);
             gitGatewayResponse.setStatus(SUCCESS);
-            gitGatewayResponse.setMessage("Tag request successfully created with tag name : "+tagName);
+            String message= new StringBuffer().append("Tag ").append(tagName).append(" successfully created on branch ").append(gitIntegratorRequest.getTargetBranch()).toString();
+            gitGatewayResponse.setMessage(message);
             gitGatewayResponse.setTagName(tagName);
             gitGatewayUtil.writeToResponseTopic(gitGatewayResponse);
         } catch (IOException e) {
