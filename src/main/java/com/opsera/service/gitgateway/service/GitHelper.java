@@ -9,7 +9,6 @@ import static com.opsera.service.gitgateway.resources.Constants.FAILED;
 import static com.opsera.service.gitgateway.resources.Constants.GITHUB;
 import static com.opsera.service.gitgateway.resources.Constants.GITLAB;
 import static com.opsera.service.gitgateway.resources.Constants.IN_PROGRESS;
-import static com.opsera.service.gitgateway.resources.Constants.OTHER;
 import static com.opsera.service.gitgateway.resources.Constants.RUN_COUNT;
 import static com.opsera.service.gitgateway.resources.Constants.SUCCESS;
 import static com.opsera.service.gitgateway.resources.Constants.TIMESTAMP;
@@ -117,7 +116,7 @@ public class GitHelper {
         gitGatewayResponse.setRunCount(request.getRunCount());
         gitGatewayResponse.setStatus(IN_PROGRESS);
         gitGatewayResponse.setStatus("Create Tag request in Progress");
-        gitGatewayUtil.writeToResponseTopic(gitGatewayResponse);
+
         try {
             Configuration config = configCollector.getToolConfigurationDetails(request);
             String readURL = getURL(request.getService()) + CREATE_TAG_REQUEST;
@@ -129,14 +128,12 @@ public class GitHelper {
             String message= new StringBuffer().append("Tag ").append(tagName).append(" successfully created on branch ").append(gitIntegratorRequest.getTargetBranch()).toString();
             gitGatewayResponse.setMessage(message);
             gitGatewayResponse.setTagName(tagName);
-            gitGatewayUtil.writeToResponseTopic(gitGatewayResponse);
-        } catch (IOException e) {
+
+        } catch (Exception e) {
             gitGatewayResponse.setStatus(FAILED);
             gitGatewayResponse.setMessage("tag creation request failed");
             log.error("tag creation request failed due to",e.getMessage());
-            gitGatewayUtil.writeToLogTopic(gitGatewayResponse);
-            gitGatewayUtil.writeToResponseTopic(gitGatewayResponse);
-            String errorMsg = new StringBuilder("Error while creating tag  ").append(" Error : ").append(e.getMessage()).toString();
+            String errorMsg = new StringBuilder("Error while creating tag  :").append(e.getMessage()).toString();
             throw new ServiceException(errorMsg);
 
         }
@@ -150,7 +147,7 @@ public class GitHelper {
         gitGatewayResponse.setRunCount(request.getRunCount());
         gitGatewayResponse.setStatus(IN_PROGRESS);
         gitGatewayResponse.setStatus("Create pull request in Progress");
-        gitGatewayUtil.writeToResponseTopic(gitGatewayResponse);
+
         try {
             Configuration config = configCollector.getToolConfigurationDetails(request);
             String readURL = getURL(request.getService()) + CREATE_PULL_REQUEST;
@@ -159,14 +156,12 @@ public class GitHelper {
             gitGatewayResponse.setStatus(SUCCESS);
             gitGatewayResponse.setMessage("pull request successfully created : "+gitResponse.getPullRequestLink());
             gitGatewayResponse.setPullRequestLink(gitResponse.getPullRequestLink());
-            gitGatewayUtil.writeToResponseTopic(gitGatewayResponse);
+
         } catch (Exception e) {
             gitGatewayResponse.setStatus(FAILED);
             gitGatewayResponse.setMessage("Pull request creation failed");
             log.error("Pull request failed",e.getMessage());
-            gitGatewayUtil.writeToLogTopic(gitGatewayResponse);
-            gitGatewayUtil.writeToResponseTopic(gitGatewayResponse);
-            String errorMsg = new StringBuilder("Error while creating pull ").append(" Error : ").append(e.getMessage()).toString();
+            String errorMsg = new StringBuilder("Error while creating pull :").append(e.getMessage()).toString();
             throw new ServiceException(errorMsg);
         }
         return gitGatewayResponse;

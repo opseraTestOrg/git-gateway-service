@@ -43,10 +43,11 @@ public class GitGatewayController {
         GitGatewayResponse response = gitGatewayTypeFactory.getGitType(request.getService()).createTag(request);
         return ResponseEntity.ok(response);
     }
-    @GetMapping("/step/status")
+    @PostMapping("/step/status")
     @ApiOperation("To create tag request")
     @TrackExecutionTime
     public ResponseEntity<GitGatewayResponse> stepStatus(){
+        log.info("Received request to check step status");
         GitGatewayResponse gitGatewayResponse=new GitGatewayResponse();
         gitGatewayResponse.setStatus("Success");
         gitGatewayResponse.setMessage("Step completed successfully");
