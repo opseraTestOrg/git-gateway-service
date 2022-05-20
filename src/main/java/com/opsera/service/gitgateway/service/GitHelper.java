@@ -24,7 +24,6 @@ import com.opsera.service.gitgateway.resources.GitGatewayRequest;
 import com.opsera.service.gitgateway.resources.GitGatewayResponse;
 import com.opsera.service.gitgateway.resources.GitIntegratorRequest;
 import com.opsera.service.gitgateway.resources.GitIntegratorResponse;
-import com.opsera.service.gitgateway.util.GitGatewayUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -106,16 +105,14 @@ public class GitHelper {
         return tagName;
     }
 
-    @Autowired
-    private GitGatewayUtil gitGatewayUtil;
+
 
     public GitGatewayResponse getGitGatewayResponseForTag(GitGatewayRequest request) {
+        log.info("Request to create tag request : {} ", request);
         GitGatewayResponse gitGatewayResponse = new GitGatewayResponse();
         gitGatewayResponse.setCustomerId(request.getCustomerId());
         gitGatewayResponse.setPipelineId(request.getPipelineId());
         gitGatewayResponse.setRunCount(request.getRunCount());
-        gitGatewayResponse.setStatus(IN_PROGRESS);
-        gitGatewayResponse.setStatus("Create Tag request in Progress");
 
         try {
             Configuration config = configCollector.getToolConfigurationDetails(request);
@@ -137,10 +134,12 @@ public class GitHelper {
             throw new ServiceException(errorMsg);
 
         }
+        log.info("Successfully created tag");
         return gitGatewayResponse;
     }
 
     public GitGatewayResponse getGitGatewayResponseForPull(GitGatewayRequest request) {
+        log.info("Request to create Pull request : {} ", request);
         GitGatewayResponse gitGatewayResponse = new GitGatewayResponse();
         gitGatewayResponse.setCustomerId(request.getCustomerId());
         gitGatewayResponse.setPipelineId(request.getPipelineId());
@@ -150,7 +149,7 @@ public class GitHelper {
 
         try {
             Configuration config = configCollector.getToolConfigurationDetails(request);
-            String readURL = getURL(request.getService()) + CREATE_PULL_REQUEST;
+            String readURL = getURL(config.getService()) + CREATE_PULL_REQUEST;
             GitIntegratorRequest gitIntegratorRequest = createRequestData(request,config);
             GitIntegratorResponse gitResponse = processGitAction(readURL, gitIntegratorRequest);
             gitGatewayResponse.setStatus(SUCCESS);
@@ -164,6 +163,7 @@ public class GitHelper {
             String errorMsg = new StringBuilder("Error while creating pull :").append(e.getMessage()).toString();
             throw new ServiceException(errorMsg);
         }
+        log.info("Successfully created Pull request ");
         return gitGatewayResponse;
     }
 
