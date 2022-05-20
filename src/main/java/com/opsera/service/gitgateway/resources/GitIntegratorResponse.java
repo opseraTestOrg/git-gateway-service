@@ -20,4 +20,5 @@ public class GitIntegratorResponse implements Serializable {
     private String pullRequestLink;
     private Integer pullRequestNum;
     private String message;
+    private String status;
 }

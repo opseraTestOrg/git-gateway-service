@@ -110,21 +110,24 @@ public class GitHelper {
     public GitGatewayResponse getGitGatewayResponseForTag(GitGatewayRequest request) {
         log.info("Request to create tag request : {} ", request);
         GitGatewayResponse gitGatewayResponse = new GitGatewayResponse();
-        gitGatewayResponse.setCustomerId(request.getCustomerId());
-        gitGatewayResponse.setPipelineId(request.getPipelineId());
-        gitGatewayResponse.setRunCount(request.getRunCount());
-
         try {
             Configuration config = configCollector.getToolConfigurationDetails(request);
-            String readURL = getURL(request.getService()) + CREATE_TAG_REQUEST;
+            String readURL = getURL(config.getService()) + CREATE_TAG_REQUEST;
             GitIntegratorRequest gitIntegratorRequest = createRequestData(request,config);
             String tagName = getTagDetails(config.getTag(), request.getRunCount().toString());
             gitIntegratorRequest.setTagName(tagName);
             GitIntegratorResponse gitResponse = processGitAction(readURL, gitIntegratorRequest);
-            gitGatewayResponse.setStatus(SUCCESS);
-            String message= new StringBuffer().append("Tag ").append(tagName).append(" successfully created on branch ").append(gitIntegratorRequest.getTargetBranch()).toString();
-            gitGatewayResponse.setMessage(message);
-            gitGatewayResponse.setTagName(tagName);
+            if(SUCCESS.equalsIgnoreCase(gitResponse.getStatus())) {
+                gitGatewayResponse.setStatus(SUCCESS);
+                String message= new StringBuffer().append("Tag ").append(tagName).append(" successfully created on branch ").append(gitIntegratorRequest.getTargetBranch()).toString();
+                gitGatewayResponse.setMessage(message);
+                gitGatewayResponse.setTagName(tagName);
+                log.info("Tag created successfully");
+            }else{
+                gitGatewayResponse.setStatus(FAILED);
+                gitGatewayResponse.setMessage(gitResponse.getMessage());
+                log.info("Tag creation failed due to : {}",gitResponse.getMessage());
+            }
 
         } catch (Exception e) {
             gitGatewayResponse.setStatus(FAILED);
@@ -134,28 +137,28 @@ public class GitHelper {
             throw new ServiceException(errorMsg);
 
         }
-        log.info("Successfully created tag");
+
         return gitGatewayResponse;
     }
 
     public GitGatewayResponse getGitGatewayResponseForPull(GitGatewayRequest request) {
         log.info("Request to create Pull request : {} ", request);
         GitGatewayResponse gitGatewayResponse = new GitGatewayResponse();
-        gitGatewayResponse.setCustomerId(request.getCustomerId());
-        gitGatewayResponse.setPipelineId(request.getPipelineId());
-        gitGatewayResponse.setRunCount(request.getRunCount());
-        gitGatewayResponse.setStatus(IN_PROGRESS);
-        gitGatewayResponse.setStatus("Create pull request in Progress");
 
         try {
             Configuration config = configCollector.getToolConfigurationDetails(request);
             String readURL = getURL(config.getService()) + CREATE_PULL_REQUEST;
             GitIntegratorRequest gitIntegratorRequest = createRequestData(request,config);
             GitIntegratorResponse gitResponse = processGitAction(readURL, gitIntegratorRequest);
-            gitGatewayResponse.setStatus(SUCCESS);
-            gitGatewayResponse.setMessage("pull request successfully created : "+gitResponse.getPullRequestLink());
-            gitGatewayResponse.setPullRequestLink(gitResponse.getPullRequestLink());
+            if(SUCCESS.equalsIgnoreCase(gitResponse.getStatus())) {
+                gitGatewayResponse.setStatus(SUCCESS);
+                gitGatewayResponse.setMessage("pull request successfully created : " + gitResponse.getPullRequestLink());
+                gitGatewayResponse.setPullRequestLink(gitResponse.getPullRequestLink());
+            }else{
+                gitGatewayResponse.setStatus(FAILED);
+                gitGatewayResponse.setMessage(gitResponse.getMessage());
 
+            }
         } catch (Exception e) {
             gitGatewayResponse.setStatus(FAILED);
             gitGatewayResponse.setMessage("Pull request creation failed");
