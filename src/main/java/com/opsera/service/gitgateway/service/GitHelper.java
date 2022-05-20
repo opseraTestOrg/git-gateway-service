@@ -93,17 +93,8 @@ public class GitHelper {
 
     }
 
-    public String getTagName(Configuration config,String runCount) {
-        String tagName = "";
-        if (config.isDynamicTag()) {
-            tagName = getTagDetails(config.getTagType().get(0).equalsIgnoreCase(OTHER) ? config.getDynamicTagName() :
-                    config.getTagType().get(0), runCount);
-        } else {
-            tagName = getTagDetails(config.getTagName(), runCount);
-        }
-        return tagName;
-    }
-    private String getTagDetails(String tagName, String runCount) {
+
+    public String getTagDetails(String tagName, String runCount) {
         if (tagName.equalsIgnoreCase(DATE) || tagName.toLowerCase().contains(DATE)) {
             tagName = tagName.replace(DATE, formatterwithDate.format(LocalDateTime.now()));
         }
@@ -131,7 +122,7 @@ public class GitHelper {
             Configuration config = configCollector.getToolConfigurationDetails(request);
             String readURL = getURL(request.getService()) + CREATE_TAG_REQUEST;
             GitIntegratorRequest gitIntegratorRequest = createRequestData(request,config);
-            String tagName = getTagName(config, request.getRunCount().toString());
+            String tagName = getTagDetails(config.getTag(), request.getRunCount().toString());
             gitIntegratorRequest.setTagName(tagName);
             GitIntegratorResponse gitResponse = processGitAction(readURL, gitIntegratorRequest);
             gitGatewayResponse.setStatus(SUCCESS);

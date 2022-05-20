@@ -23,8 +23,5 @@ public class Configuration implements Serializable {
     private String gitBranch;
     private String targetBranch;
     private String workspace;
-    private boolean dynamicTag;
-    private List<String> tagType;
-    private String dynamicTagName;
-    private String tagName;
+    private String tag;
 }
