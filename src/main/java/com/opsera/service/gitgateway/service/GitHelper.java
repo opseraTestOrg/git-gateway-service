@@ -116,6 +116,7 @@ public class GitHelper {
             GitIntegratorRequest gitIntegratorRequest = createRequestData(request,config);
             String tagName = getTagDetails(config.getTag(), request.getRunCount().toString());
             gitIntegratorRequest.setTagName(tagName);
+            gitIntegratorRequest.setTargetBranch(config.getGitBranch());
             GitIntegratorResponse gitResponse = processGitAction(readURL, gitIntegratorRequest);
             if(SUCCESS.equalsIgnoreCase(gitResponse.getStatus())) {
                 gitGatewayResponse.setStatus(SUCCESS);
