@@ -24,4 +24,5 @@ public class Configuration implements Serializable {
     private String targetBranch;
     private String workspace;
     private String tag;
+    private String service;
 }
