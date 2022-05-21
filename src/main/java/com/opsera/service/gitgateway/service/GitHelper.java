@@ -80,7 +80,7 @@ public class GitHelper {
                 .customerId(request.getCustomerId())
                 .gitBranch(config.getGitBranch())
                 .targetBranch(config.getTargetBranch())
-                .projectId(config.getProjectId())//bitbucket repository
+                .projectId(config.getRepoId())//bitbucket repository
                 .workspace(config.getWorkspace())//bitbucket workspace
                 .build();
         return gitIntegratorRequest;
