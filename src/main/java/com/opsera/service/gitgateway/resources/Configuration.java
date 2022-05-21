@@ -25,4 +25,5 @@ public class Configuration implements Serializable {
     private String workspace;
     private String tag;
     private String service;
+    private String repoId;
 }
