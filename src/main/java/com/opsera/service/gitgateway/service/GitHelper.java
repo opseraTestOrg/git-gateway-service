@@ -153,7 +153,7 @@ public class GitHelper {
             GitIntegratorResponse gitResponse = processGitAction(readURL, gitIntegratorRequest);
             if(SUCCESS.equalsIgnoreCase(gitResponse.getStatus())) {
                 gitGatewayResponse.setStatus(SUCCESS);
-                gitGatewayResponse.setMessage("pull request successfully created : " + gitResponse.getPullRequestLink());
+                gitGatewayResponse.setMessage(gitResponse.getMessage());
                 gitGatewayResponse.setPullRequestLink(gitResponse.getPullRequestLink());
             }else{
                 gitGatewayResponse.setStatus(FAILED);
