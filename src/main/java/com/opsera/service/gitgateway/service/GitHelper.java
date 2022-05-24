@@ -145,9 +145,14 @@ public class GitHelper {
     public GitGatewayResponse getGitGatewayResponseForPull(GitGatewayRequest request) {
         log.info("Request to create Pull request : {} ", request);
         GitGatewayResponse gitGatewayResponse = new GitGatewayResponse();
+        Configuration config =null;
 
         try {
-            Configuration config = configCollector.getToolConfigurationDetails(request);
+            if(request.getGitTaskId()!=null) {
+                config = configCollector.getToolConfigurationDetails(request);
+            }else{
+                config=configCollector.getTaskConfiguration(request.getCustomerId(), request.getGitTaskId());
+            }
             String readURL = getURL(config.getService()) + CREATE_PULL_REQUEST;
             GitIntegratorRequest gitIntegratorRequest = createRequestData(request,config);
             GitIntegratorResponse gitResponse = processGitAction(readURL, gitIntegratorRequest);
