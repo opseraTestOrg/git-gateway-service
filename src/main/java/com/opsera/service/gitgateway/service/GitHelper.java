@@ -133,7 +133,7 @@ public class GitHelper {
         } catch (Exception e) {
             gitGatewayResponse.setStatus(FAILED);
             gitGatewayResponse.setMessage("tag creation request failed");
-            log.error("tag creation request failed due to",e.getMessage());
+            log.error("tag creation request failed due to",e);
             String errorMsg = new StringBuilder("Error while creating tag  :").append(e.getMessage()).toString();
             throw new ServiceException(errorMsg);
 
@@ -168,7 +168,7 @@ public class GitHelper {
         } catch (Exception e) {
             gitGatewayResponse.setStatus(FAILED);
             gitGatewayResponse.setMessage("Pull request creation failed");
-            log.error("Pull request failed",e.getMessage());
+            log.error("Pull request failed",e);
             String errorMsg = new StringBuilder("Error while creating pull :").append(e.getMessage()).toString();
             throw new ServiceException(errorMsg);
         }
