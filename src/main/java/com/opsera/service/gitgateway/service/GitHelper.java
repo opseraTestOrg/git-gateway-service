@@ -148,7 +148,7 @@ public class GitHelper {
         Configuration config =null;
 
         try {
-            if(request.getGitTaskId()!=null) {
+            if(StringUtils.isEmpty(request.getGitTaskId())) {
                 config = configCollector.getToolConfigurationDetails(request);
             }else{
                 config=configCollector.getTaskConfiguration(request.getCustomerId(), request.getGitTaskId());
