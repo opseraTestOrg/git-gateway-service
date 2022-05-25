@@ -133,7 +133,7 @@ public class GitHelper {
         } catch (Exception e) {
             gitGatewayResponse.setStatus(FAILED);
             gitGatewayResponse.setMessage("tag creation request failed");
-            log.error("tag creation request failed due to",e.getMessage());
+            log.error("tag creation request failed due to",e);
             String errorMsg = new StringBuilder("Error while creating tag  :").append(e.getMessage()).toString();
             throw new ServiceException(errorMsg);
 
@@ -145,9 +145,14 @@ public class GitHelper {
     public GitGatewayResponse getGitGatewayResponseForPull(GitGatewayRequest request) {
         log.info("Request to create Pull request : {} ", request);
         GitGatewayResponse gitGatewayResponse = new GitGatewayResponse();
+        Configuration config =null;
 
         try {
-            Configuration config = configCollector.getToolConfigurationDetails(request);
+            if(StringUtils.isEmpty(request.getGitTaskId())) {
+                config = configCollector.getToolConfigurationDetails(request);
+            }else{
+                config=configCollector.getTaskConfiguration(request.getCustomerId(), request.getGitTaskId());
+            }
             String readURL = getURL(config.getService()) + CREATE_PULL_REQUEST;
             GitIntegratorRequest gitIntegratorRequest = createRequestData(request,config);
             GitIntegratorResponse gitResponse = processGitAction(readURL, gitIntegratorRequest);
@@ -163,7 +168,7 @@ public class GitHelper {
         } catch (Exception e) {
             gitGatewayResponse.setStatus(FAILED);
             gitGatewayResponse.setMessage("Pull request creation failed");
-            log.error("Pull request failed",e.getMessage());
+            log.error("Pull request failed",e);
             String errorMsg = new StringBuilder("Error while creating pull :").append(e.getMessage()).toString();
             throw new ServiceException(errorMsg);
         }

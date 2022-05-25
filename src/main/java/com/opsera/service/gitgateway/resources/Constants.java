@@ -21,7 +21,7 @@ public class Constants {
     public static final String FAILED = "Failed";
     public static final String SUCCESS = "Success";
     public static final String IN_PROGRESS = "In Progress";
-
+    public static final String TASK_CONFIG_ENDPOINT = "/gittask/configuration";
     public static final String OPSERA_PIPELINE_GITACTIONS_REQUEST = "";
 
 
