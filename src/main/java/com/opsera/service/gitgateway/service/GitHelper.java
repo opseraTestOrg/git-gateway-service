@@ -75,12 +75,13 @@ public class GitHelper {
     }
 
     public GitIntegratorRequest createRequestData(GitGatewayRequest request, Configuration config) throws IOException {
+        String repoId = config.getRepoId() != null ? config.getRepoId() : config.getProjectId();
         GitIntegratorRequest gitIntegratorRequest= GitIntegratorRequest.builder()
                 .gitToolId(config.getGitToolId())
                 .customerId(request.getCustomerId())
                 .gitBranch(config.getGitBranch())
                 .targetBranch(config.getTargetBranch())
-                .projectId(config.getRepoId())//bitbucket repository
+                .projectId(repoId)//bitbucket repository
                 .workspace(config.getWorkspace())//bitbucket workspace
                 .build();
         return gitIntegratorRequest;
