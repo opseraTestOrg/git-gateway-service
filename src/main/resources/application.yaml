@@ -1,0 +1,51 @@
+logging:
+  file: 
+    name: gitgatewayservice
+    path: /apps/OpsERA/logs/components/git-gateway-service
+server:
+  port: 8094
+  shutdown: graceful
+spring:
+  application:
+    name: git-gateway-service
+    description: API integration for Git gateway service
+  lifecycle:
+    timeout-per-shutdown-phase: 2h
+  task:
+    execution:
+      pool:
+        core-size: 50
+        queue-capacity: 100 
+        max-size: 200
+      shutdown:
+        await-termination: true
+        await-termination-period: 2h
+      thread-name-prefix: GitGatewayThread-
+kafka:
+  consumer:
+    autocommit.interval: 10
+    concurrentcount: 3
+  service:
+    baseurl: ${opsera.config.baseurl}/api/kafka
+retry:
+  interval: 10000
+  count: 3
+opsera:
+  gitlab:
+    baseurl: ${opsera.config.baseurl}/api/gitlab
+  github:
+    baseurl: ${opsera.config.baseurl}/api/github
+  bitbucket:
+    baseurl: ${opsera.config.baseurl}/api/bitbucket
+
+---
+
+spring:
+  profiles: kubernetes
+kafka:
+  bootstrapServer: ${OPSERA_KAFKA_BOOTSTRAP_URL}
+  consumer:
+    groupId: gitgateway-kubernetes-group
+opsera:
+  config:
+    baseurl: ${OPSERA_API_SERVICE_URL:http://opsera-apigateway.microservices.svc.cluster.local:9091}

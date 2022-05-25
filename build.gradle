@@ -1,0 +1,82 @@
+buildscript {
+	repositories {
+		mavenCentral()
+		jcenter()
+		maven {
+			url "https://plugins.gradle.org/m2/"
+    	}
+	}
+	dependencies {
+		classpath("org.springframework.boot:spring-boot-gradle-plugin:2.6.7")
+		classpath('org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.8.0.1969')
+	}
+}
+
+description = projectDesc
+
+apply plugin: 'java'
+apply plugin: 'maven'
+apply plugin: 'eclipse'
+apply plugin: 'org.springframework.boot'
+apply plugin: 'io.spring.dependency-management'
+apply plugin: 'jacoco'
+apply plugin: 'org.sonarqube'
+
+jar {
+	baseName = projectName
+	version = projectVersion
+	enabled = false
+}
+test {
+	useJUnitPlatform()
+	finalizedBy jacocoTestReport
+}
+jacocoTestReport {
+	dependsOn test
+}
+jacoco {
+	toolVersion = "0.8.5"
+	reportsDir = file("$buildDir/jacoco")
+}
+
+archivesBaseName = projectName
+version = projectVersion
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+	mavenCentral()
+	jcenter()
+	maven {
+    		url "https://opserarepo.jfrog.io/artifactory/opsera-platform-libs-release"
+    		credentials {
+            username "support@opsera.io"
+            password "eyJ2ZXIiOiIyIiwidHlwIjoiSldUIiwiYWxnIjoiUlMyNTYiLCJraWQiOiI0V0c0bE1FTGNVQVNRWEtaSm1ib1VSNkpBcnZUMjdwNzQyOTZqaGtMZndBIn0.eyJleHQiOiJ7XCJyZXZvY2FibGVcIjpcInRydWVcIn0iLCJzdWIiOiJqZmFjQDAxZnA2NHE4eGM3d3RoMDF2cWN5NnkwdnZoXC91c2Vyc1wvc3VwcG9ydEBvcHNlcmEuaW8iLCJzY3AiOiJhcHBsaWVkLXBlcm1pc3Npb25zXC91c2VyIiwiYXVkIjpbImpmcnRAKiIsImpmYWNAKiIsImpmZXZ0QCoiLCJqZm1kQCoiLCJqZmNvbkAqIl0sImlzcyI6ImpmZmVAMDAwIiwiZXhwIjoxNjcwMzA5MzQ0LCJpYXQiOjE2Mzg3NzMzNDQsImp0aSI6ImU2OWFhZGMwLTgxODgtNDI0MS1hYTAxLWVkZGI5YjYzMWRhMSJ9.PWQoY1NPOpyt6LSOYrbcsouHQeOlGbagYdAjU38U8saD5psG8ezLhf1Tq4ZxCxTzyw8vIofZuLzopzRzQRZifnu__NmmbpZf6xvwc9IGTCreapL6qRop3SPP1DlziNmAZGoacHoHmX_l11bSj1ty9M3zyHR6z1X5sZVxCucD9xYuFuN7TzONAyl4CK5Qg_4PRPHXfRtTKCp2hG_WoSAdLUq9XcQHUldnXztiPiq6XICrfjPq9yPr4i3BGpkJ9HEkJv623XebojcLCKCF-ee3Bwd_8cCvSh06koxj9gxZV9ycnMVrW9TkW_xHQfg0Cf4vxiU5Mr16b2RI4x_Om-psOA"
+        }
+    	}
+}
+
+dependencies {
+	compile('org.springframework.boot:spring-boot-starter-web')
+	compile('org.springframework.boot:spring-boot-starter-web-services')
+	compile('org.springframework.boot:spring-boot-starter-aop')
+	implementation('com.opsera:kubernetes-client:1.2.0')
+	compile('com.opsera:java-core-library:1.6')
+	compile('org.apache.httpcomponents:httpclient:4.5.12')
+	compile('io.springfox:springfox-swagger-ui:2.9.2')
+	compile('io.springfox:springfox-swagger2:2.9.2')
+	compile('com.google.code.gson:gson:2.8.6')
+	compile('commons-discovery:commons-discovery:0.5')
+	compile('commons-logging:commons-logging:1.0.4')
+	compile('joda-time:joda-time:2.10.6')
+	compileOnly 'org.projectlombok:lombok:1.18.4'
+	annotationProcessor 'org.projectlombok:lombok'
+	testCompile('org.springframework.boot:spring-boot-starter-test')
+	implementation 'org.springframework.kafka:spring-kafka:2.8.4'
+	implementation 'commons-io:commons-io:2.11.0'
+	implementation 'org.apache.commons:commons-lang3:3.12.0'
+	testImplementation 'org.springframework.kafka:spring-kafka-test:2.8.4'
+
+
+}
