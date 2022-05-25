@@ -1,5 +1,6 @@
 package com.opsera.service.gitgateway.service;
 
+import static com.opsera.service.gitgateway.resources.Constants.TASK_CONFIG_ENDPOINT;
 import static com.opsera.service.gitgateway.resources.Constants.TOOLS_CONFIG_URL;
 import com.opsera.core.rest.RestTemplateHelper;
 import com.opsera.service.gitgateway.config.AppConfig;
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.Optional;
 
 @Component
 @Slf4j
@@ -32,6 +34,22 @@ public class ConfigCollector {
     public Configuration getToolConfigurationDetails(GitGatewayRequest request) throws IOException {
         String url = appConfig.getPipelineConfigBaseUrl() + TOOLS_CONFIG_URL;
         return restTemplateHelper.postForEntity(Configuration.class, url, request);
+    }
+
+    public Configuration getTaskConfiguration(String customerId, String taskId) throws Exception {
+        log.info("Getting the Git task Configuration for gitTask Id {}, customer Id {}", taskId, customerId);
+        GitGatewayRequest request = new GitGatewayRequest();
+        request.setGitTaskId(taskId);
+        request.setCustomerId(customerId);
+        String toolsConfigURL = appConfig.getPipelineConfigBaseUrl() + TASK_CONFIG_ENDPOINT;
+        Configuration response = restTemplateHelper.postForEntity(Configuration.class, toolsConfigURL, request);
+        Optional<Configuration> gitConfiguration = Optional.ofNullable(response);
+        if (gitConfiguration.isPresent()) {
+            return gitConfiguration.get();
+        } else {
+            throw new Exception(String.format("Git Task configuration details not found for taskId: %s, customer: %s", taskId, customerId));
+        }
+
     }
 
 
