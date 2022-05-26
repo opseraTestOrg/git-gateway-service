@@ -8,7 +8,6 @@ import static com.opsera.service.gitgateway.resources.Constants.DATE;
 import static com.opsera.service.gitgateway.resources.Constants.FAILED;
 import static com.opsera.service.gitgateway.resources.Constants.GITHUB;
 import static com.opsera.service.gitgateway.resources.Constants.GITLAB;
-import static com.opsera.service.gitgateway.resources.Constants.IN_PROGRESS;
 import static com.opsera.service.gitgateway.resources.Constants.RUN_COUNT;
 import static com.opsera.service.gitgateway.resources.Constants.SUCCESS;
 import static com.opsera.service.gitgateway.resources.Constants.TIMESTAMP;
@@ -28,10 +27,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -76,12 +78,7 @@ public class GitHelper {
 
     public GitIntegratorRequest createRequestData(GitGatewayRequest request, Configuration config) throws IOException {
         String repoId = config.getRepoId() != null ? config.getRepoId() : config.getProjectId();
-        GitIntegratorRequest gitIntegratorRequest= GitIntegratorRequest.builder()
-                .gitToolId(config.getGitToolId())
-                .customerId(request.getCustomerId())
-                .gitBranch(config.getGitBranch())
-                .targetBranch(config.getTargetBranch())
-                .projectId(repoId)//bitbucket repository
+        GitIntegratorRequest gitIntegratorRequest = GitIntegratorRequest.builder().gitToolId(config.getGitToolId()).customerId(request.getCustomerId()).gitBranch(config.getGitBranch()).targetBranch(config.getTargetBranch()).projectId(repoId)//bitbucket repository
                 .workspace(config.getWorkspace())//bitbucket workspace
                 .build();
         return gitIntegratorRequest;
@@ -118,6 +115,7 @@ public class GitHelper {
             String tagName = getTagDetails(config.getTag(), request.getRunCount().toString());
             gitIntegratorRequest.setTagName(tagName);
             gitIntegratorRequest.setTargetBranch(config.getGitBranch());
+            validateTagRequestData(gitIntegratorRequest);
             GitIntegratorResponse gitResponse = processGitAction(readURL, gitIntegratorRequest);
             if(SUCCESS.equalsIgnoreCase(gitResponse.getStatus())) {
                 gitGatewayResponse.setStatus(SUCCESS);
@@ -156,6 +154,7 @@ public class GitHelper {
             }
             String readURL = getURL(config.getService()) + CREATE_PULL_REQUEST;
             GitIntegratorRequest gitIntegratorRequest = createRequestData(request,config);
+            validatePullRequestData(gitIntegratorRequest);
             GitIntegratorResponse gitResponse = processGitAction(readURL, gitIntegratorRequest);
             if(SUCCESS.equalsIgnoreCase(gitResponse.getStatus())) {
                 gitGatewayResponse.setStatus(SUCCESS);
@@ -175,6 +174,30 @@ public class GitHelper {
         }
         log.info("Successfully created Pull request ");
         return gitGatewayResponse;
+    }
+
+    private void validatePullRequestData(GitIntegratorRequest request) {
+        List<String> missingData = new ArrayList<>();
+        if (StringUtils.isEmpty(request.getGitToolId())) missingData.add("Git Tool");
+        if (StringUtils.isEmpty(request.getGitBranch())) missingData.add("Source Branch");
+        if (StringUtils.isEmpty(request.getTargetBranch())) missingData.add("target Branch");
+        if (StringUtils.isEmpty(request.getProjectId())) missingData.add("Project details");
+
+        if (!CollectionUtils.isEmpty(missingData)) {
+            throw new ServiceException("Incomplete configuration : Please provide required data for " + missingData + " to raise pull request");
+        }
+    }
+
+    private void validateTagRequestData(GitIntegratorRequest request) {
+        List<String> missingData = new ArrayList<>();
+        if (StringUtils.isEmpty(request.getGitToolId())) missingData.add("Git Tool");
+        if (StringUtils.isEmpty(request.getProjectId())) missingData.add("Project/Repo details");
+        if (StringUtils.isEmpty(request.getTagName())) missingData.add("Tag Name");
+        if (StringUtils.isEmpty(request.getTargetBranch())) missingData.add("Git Branch");
+
+        if (!CollectionUtils.isEmpty(missingData)) {
+            throw new ServiceException("Incomplete configuration : Please provide required data " + missingData + " to raise tag");
+        }
     }
 
 }
