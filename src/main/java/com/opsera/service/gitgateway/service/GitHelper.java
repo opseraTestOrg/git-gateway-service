@@ -8,7 +8,6 @@ import static com.opsera.service.gitgateway.resources.Constants.DATE;
 import static com.opsera.service.gitgateway.resources.Constants.FAILED;
 import static com.opsera.service.gitgateway.resources.Constants.GITHUB;
 import static com.opsera.service.gitgateway.resources.Constants.GITLAB;
-import static com.opsera.service.gitgateway.resources.Constants.IN_PROGRESS;
 import static com.opsera.service.gitgateway.resources.Constants.RUN_COUNT;
 import static com.opsera.service.gitgateway.resources.Constants.SUCCESS;
 import static com.opsera.service.gitgateway.resources.Constants.TIMESTAMP;
@@ -118,6 +117,7 @@ public class GitHelper {
             String tagName = getTagDetails(config.getTag(), request.getRunCount().toString());
             gitIntegratorRequest.setTagName(tagName);
             gitIntegratorRequest.setTargetBranch(config.getGitBranch());
+            validateTagRequestData(gitIntegratorRequest);
             GitIntegratorResponse gitResponse = processGitAction(readURL, gitIntegratorRequest);
             if(SUCCESS.equalsIgnoreCase(gitResponse.getStatus())) {
                 gitGatewayResponse.setStatus(SUCCESS);
@@ -156,6 +156,7 @@ public class GitHelper {
             }
             String readURL = getURL(config.getService()) + CREATE_PULL_REQUEST;
             GitIntegratorRequest gitIntegratorRequest = createRequestData(request,config);
+            validatePullRequestData(gitIntegratorRequest);
             GitIntegratorResponse gitResponse = processGitAction(readURL, gitIntegratorRequest);
             if(SUCCESS.equalsIgnoreCase(gitResponse.getStatus())) {
                 gitGatewayResponse.setStatus(SUCCESS);
@@ -175,6 +176,18 @@ public class GitHelper {
         }
         log.info("Successfully created Pull request ");
         return gitGatewayResponse;
+    }
+
+    private void validatePullRequestData(GitIntegratorRequest request) {
+        if (StringUtils.isEmpty(request.getGitToolId()) || StringUtils.isEmpty(request.getGitBranch()) || StringUtils.isEmpty(request.getTargetBranch()) || StringUtils.isEmpty(request.getProjectId())) {
+            throw new ServiceException("Incomplete configuration : Please provide required data to raise pull request");
+        }
+    }
+
+    private void validateTagRequestData(GitIntegratorRequest request) {
+        if (StringUtils.isEmpty(request.getGitToolId()) || StringUtils.isEmpty(request.getTagName()) || StringUtils.isEmpty(request.getTargetBranch()) || StringUtils.isEmpty(request.getProjectId())) {
+            throw new ServiceException("Incomplete configuration : Please provide required data to raise tag");
+        }
     }
 
 }
