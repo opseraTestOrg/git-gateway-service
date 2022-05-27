@@ -29,4 +29,5 @@ public class GitGatewayRequest implements Serializable {
     private String action;
     private String service;
     private Integer runCount;
+    private String gitTaskId;
 }
