@@ -32,13 +32,13 @@ retry:
   count: 3
 opsera:
   gitlab:
-    baseurl: http://localhost:8079
+    baseurl: ${opsera.config.baseurl}/api/gitlab
   github:
-    baseurl: http://localhost:8074
+    baseurl: ${opsera.config.baseurl}/api/github
   bitbucket:
-    baseurl: http://localhost:8078
+    baseurl: ${opsera.config.baseurl}/api/bitbucket
   client:
-    host: ${OPSERA_CLIENT_HOST:dev.opsera.io}
+    host: ${OPSERA_CLIENT_HOST}
 
 ---
 
@@ -50,4 +50,4 @@ kafka:
     groupId: gitgateway-kubernetes-group
 opsera:
   config:
-    baseurl: ${OPSERA_API_SERVICE_URL:https://apigateway.opsera-dev-private.opsera.io}
+    baseurl: ${OPSERA_API_SERVICE_URL:http://opsera-apigateway.microservices.svc.cluster.local:9091}

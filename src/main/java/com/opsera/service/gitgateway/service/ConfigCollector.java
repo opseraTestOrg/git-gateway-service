@@ -1,5 +1,7 @@
 package com.opsera.service.gitgateway.service;
 
+import static com.opsera.service.gitgateway.resources.Constants.PIPELINE_ACTIVITIES_URL;
+import static com.opsera.service.gitgateway.resources.Constants.PIPELINE_DETAILS;
 import static com.opsera.service.gitgateway.resources.Constants.TASK_CONFIG_ENDPOINT;
 import static com.opsera.service.gitgateway.resources.Constants.TOOLS_CONFIG_URL;
 import com.opsera.core.rest.RestTemplateHelper;
@@ -8,7 +10,6 @@ import com.opsera.service.gitgateway.resources.Configuration;
 import com.opsera.service.gitgateway.resources.GitGatewayRequest;
 import com.opsera.service.gitgateway.resources.Pipelines;
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -40,7 +41,7 @@ public class ConfigCollector {
 
     public Pipelines getPipelineDetails(GitGatewayRequest request) throws IOException {
 
-        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromHttpUrl(appConfig.getPipelineConfigBaseUrl()).path("/v2/pipeline").queryParam("pipelineId", request.getPipelineId())
+        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromHttpUrl(appConfig.getPipelineConfigBaseUrl()).path(PIPELINE_DETAILS).queryParam("pipelineId", request.getPipelineId())
                 .queryParam("customerId", request.getCustomerId());
         return restTemplateHelper.getForEntity(Pipelines.class, uriBuilder.toUriString());
 
@@ -61,13 +62,19 @@ public class ConfigCollector {
         }
 
     }
+
     public String getPipelineActivities(GitGatewayRequest request) throws IOException {
-        GitGatewayRequest pipelineActivitiesRequest=new GitGatewayRequest();
+        GitGatewayRequest pipelineActivitiesRequest = new GitGatewayRequest();
         pipelineActivitiesRequest.setPipelineId(request.getPipelineId());
         pipelineActivitiesRequest.setCustomerId(request.getCustomerId());
         pipelineActivitiesRequest.setRunCount(request.getRunCount());
-        String url = appConfig.getPipelineConfigBaseUrl() + "/pipelineactivitiesforpipeline";
-        return restTemplateHelper.postForEntity(String.class,url,request);
+        String url = appConfig.getPipelineConfigBaseUrl() + PIPELINE_ACTIVITIES_URL;
+        try {
+            return restTemplateHelper.postForEntity(String.class, url, request);
+        } catch (Exception ex) {
+            log.error("Pipeline Activities not available due to :", ex);
+        }
+        return "";
 
     }
 
