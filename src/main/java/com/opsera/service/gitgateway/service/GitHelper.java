@@ -8,12 +8,15 @@ import static com.opsera.service.gitgateway.resources.Constants.DATE;
 import static com.opsera.service.gitgateway.resources.Constants.FAILED;
 import static com.opsera.service.gitgateway.resources.Constants.GITHUB;
 import static com.opsera.service.gitgateway.resources.Constants.GITLAB;
+import static com.opsera.service.gitgateway.resources.Constants.OPSERA_PIPELINE_SUMMARY_URL;
 import static com.opsera.service.gitgateway.resources.Constants.RUN_COUNT;
 import static com.opsera.service.gitgateway.resources.Constants.SUCCESS;
 import static com.opsera.service.gitgateway.resources.Constants.TIMESTAMP;
 import static com.opsera.service.gitgateway.resources.Constants.YYYY_MM_DD;
 import static com.opsera.service.gitgateway.resources.Constants.YYYY_MM_DD_HH_MM_SS;
 
+import com.google.gson.Gson;
+import com.opsera.core.enums.KafkaResponseTopics;
 import com.opsera.core.exception.ServiceException;
 import com.opsera.core.rest.RestTemplateHelper;
 import com.opsera.service.gitgateway.config.AppConfig;
@@ -23,6 +26,8 @@ import com.opsera.service.gitgateway.resources.GitGatewayRequest;
 import com.opsera.service.gitgateway.resources.GitGatewayResponse;
 import com.opsera.service.gitgateway.resources.GitIntegratorRequest;
 import com.opsera.service.gitgateway.resources.GitIntegratorResponse;
+import com.opsera.service.gitgateway.resources.PipelineActivities;
+import com.opsera.service.gitgateway.resources.Pipelines;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +38,9 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 /**
@@ -80,6 +87,7 @@ public class GitHelper {
         String repoId = config.getRepoId() != null ? config.getRepoId() : config.getProjectId();
         GitIntegratorRequest gitIntegratorRequest = GitIntegratorRequest.builder().gitToolId(config.getGitToolId()).customerId(request.getCustomerId()).gitBranch(config.getGitBranch()).targetBranch(config.getTargetBranch()).projectId(repoId)//bitbucket repository
                 .workspace(config.getWorkspace())//bitbucket workspace
+                .description(request.getDescription())
                 .build();
         return gitIntegratorRequest;
 
@@ -147,12 +155,36 @@ public class GitHelper {
         Configuration config =null;
 
         try {
-            if(StringUtils.isEmpty(request.getGitTaskId())) {
+            /*String pipelineActivities = configCollector.getPipelineActivities(request);
+            PipelineActivities[] res = new Gson().fromJson(pipelineActivities, PipelineActivities[].class);
+            List<PipelineActivities> pipelineActivitiesList = Arrays.asList(res);
+            pipelineActivitiesList=pipelineActivitiesList.stream().filter(pipelineActivities1 ->
+                    KafkaResponseTopics.OPSERA_PIPELINE_STATUS.getTopicName().equalsIgnoreCase(pipelineActivities1.getStepConfiguration().getTopic()
+                    *//*)&& SUCCESS.equalsIgnoreCase(pipelineActivities1.getStatus()*//*)
+            ).collect(Collectors.toList());
+            log.info("activities {}",pipelineActivitiesList);
+
+            StringBuilder desc= new StringBuilder("Steps Completed Before Pull request creation");
+
+            pipelineActivitiesList.forEach(
+                    activity->{
+                        Integer stepIndex=activity.getStepIndex().intValue()+1;
+                        desc.append("\nStep Name : "+activity.getStepName()).append("\nStep Index : "+stepIndex).append("\nMessage : "+activity.getMessage()).append("\nStatus : "+activity.getStatus()).append("\n\n");
+                    }
+            );
+
+            Pipelines pipeline = configCollector.getPipelineDetails(request);
+            String pipelineInfo = pipeline.getName().concat("- "+request.getRunCount()).concat(String.format(OPSERA_PIPELINE_SUMMARY_URL,appConfig.getOpseraClientHost(),request.getPipelineId()));
+            desc.append(pipelineInfo);
+            log.info(" desc {}",desc);
+            request.setDescription(desc.toString());
+            */if(StringUtils.isEmpty(request.getGitTaskId())) {
                 config = configCollector.getToolConfigurationDetails(request);
             }else{
                 config=configCollector.getTaskConfiguration(request.getCustomerId(), request.getGitTaskId());
             }
             String readURL = getURL(config.getService()) + CREATE_PULL_REQUEST;
+
             GitIntegratorRequest gitIntegratorRequest = createRequestData(request,config);
             validatePullRequestData(gitIntegratorRequest);
             GitIntegratorResponse gitResponse = processGitAction(readURL, gitIntegratorRequest);
