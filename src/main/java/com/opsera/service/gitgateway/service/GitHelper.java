@@ -168,7 +168,7 @@ public class GitHelper {
 
             StringBuilder desc = new StringBuilder(pipelineInfo);
             if (!CollectionUtils.isEmpty(pipelineActivitiesList)) {
-                desc.append("\n\nSteps Completed Before Pull request creation");
+                desc.append("\n\nSteps Completed Before Pull request creation:");
                 pipelineActivitiesList.forEach(
                         activity -> {
                             Integer stepIndex = activity.getStepIndex().intValue() + 1;
@@ -211,7 +211,11 @@ public class GitHelper {
 
     public List<PipelineActivities> getPipelineActivities(GitGatewayRequest request) throws IOException {
         List<PipelineActivities> pipelineActivitiesList = null;
-        String pipelineActivities = configCollector.getPipelineActivities(request);
+        GitGatewayRequest pipelineActivityRequest=new GitGatewayRequest();
+        pipelineActivityRequest.setPipelineId(request.getPipelineId());
+        pipelineActivityRequest.setCustomerId(request.getCustomerId());
+        pipelineActivityRequest.setRunCount(request.getRunCount());
+        String pipelineActivities = configCollector.getPipelineActivities(pipelineActivityRequest);
         if (!StringUtils.isEmpty(pipelineActivities)) {
             PipelineActivities[] res = gson.fromJson(pipelineActivities, PipelineActivities[].class);
             pipelineActivitiesList = Arrays.stream(res).filter(pipelineActivities1 ->
