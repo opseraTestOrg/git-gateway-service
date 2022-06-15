@@ -160,30 +160,22 @@ public class GitHelper {
         Configuration config =null;
 
         try {
-            Pipelines pipeline = configCollector.getPipelineDetails(request);//to get pipeline Name
-            String pipelineInfo = "Pipeline Information : \n\n Name : " + pipeline.getName().concat("\n Run Count :" + request.getRunCount()).concat("\n link : ").concat(String.format(OPSERA_PIPELINE_SUMMARY_URL, appConfig.getOpseraClientHost(), request.getPipelineId()));
-
-            List<PipelineActivities> pipelineActivitiesList = getPipelineActivities(request);
-            log.info("activities {}", pipelineActivitiesList);
-
-            StringBuilder desc = new StringBuilder(pipelineInfo);
-            if (!CollectionUtils.isEmpty(pipelineActivitiesList)) {
-                desc.append("\n\nSteps Completed Before Pull request creation:");
-                pipelineActivitiesList.forEach(
-                        activity -> {
-                            Integer stepIndex = activity.getStepIndex().intValue() + 1;
-                            desc.append("\nStep Name : " + activity.getStepName()).append("\nStep Index : " + stepIndex).append("\nMessage : " + activity.getMessage()).append("\nStatus : " + activity.getStatus()).append("\n\n");
-                        }
-                );
-            }
-
-            log.info(" desc {}", desc);
-            request.setDescription(desc.toString());
             if (StringUtils.isEmpty(request.getGitTaskId())) {
                 config = configCollector.getToolConfigurationDetails(request);
             } else {
                 config = configCollector.getTaskConfiguration(request.getCustomerId(), request.getGitTaskId());
             }
+            
+            StringBuilder desc = new StringBuilder();
+            if(BITBUCKET.equalsIgnoreCase(config.getService())){
+                desc = getDescriptionWithPipelineDetailsForBitBucket(request);
+            }else{
+                desc = getDescriptionWithPipelineDetailsForGit(request);
+            }
+
+            log.info(" desc {}", desc);
+            request.setDescription(desc.toString());
+            
             String readURL = getURL(config.getService()) + CREATE_PULL_REQUEST;
 
             GitIntegratorRequest gitIntegratorRequest = createRequestData(request,config);
@@ -207,6 +199,46 @@ public class GitHelper {
         }
         log.info("Successfully created Pull request ");
         return gitGatewayResponse;
+    }
+
+    private StringBuilder getDescriptionWithPipelineDetailsForBitBucket(GitGatewayRequest request) throws IOException {
+        Pipelines pipeline = configCollector.getPipelineDetails(request);//to get pipeline Name
+        String pipelineInfo = "**Pipeline Information :** \n\n Name : " + pipeline.getName().concat("\n\n Run Count :" + request.getRunCount()).concat("\n\n link : ").concat(String.format(OPSERA_PIPELINE_SUMMARY_URL, appConfig.getOpseraClientHost(), request.getPipelineId()));
+
+        List<PipelineActivities> pipelineActivitiesList = getPipelineActivities(request);
+        log.info("activities {}", pipelineActivitiesList);
+
+        StringBuilder desc = new StringBuilder(pipelineInfo);
+        if (!CollectionUtils.isEmpty(pipelineActivitiesList)) {
+            desc.append("\n\n**Steps Completed Before Pull request creation:**");
+            pipelineActivitiesList.forEach(
+                    activity -> {
+                        Integer stepIndex = activity.getStepIndex().intValue() + 1;
+                        desc.append("\n\nStep Name : " + activity.getStepName()).append("\n\nStep Index : " + stepIndex).append("\n\nMessage : " + activity.getMessage()).append("\n\nStatus : " + activity.getStatus()).append("\n\n");
+                    }
+            );
+        }
+        return desc;
+    }
+
+    private StringBuilder getDescriptionWithPipelineDetailsForGit(GitGatewayRequest request) throws IOException {
+        Pipelines pipeline = configCollector.getPipelineDetails(request);//to get pipeline Name
+        String pipelineInfo = "<b>Pipeline Information</b> : <br>\n\n Name : " + pipeline.getName().concat("<br>\n Run Count :" + request.getRunCount()).concat("<br>\n link : ").concat(String.format(OPSERA_PIPELINE_SUMMARY_URL, appConfig.getOpseraClientHost(), request.getPipelineId()));
+
+        List<PipelineActivities> pipelineActivitiesList = getPipelineActivities(request);
+        log.info("activities {}", pipelineActivitiesList);
+
+        StringBuilder desc = new StringBuilder(pipelineInfo);
+        if (!CollectionUtils.isEmpty(pipelineActivitiesList)) {
+            desc.append("<br><br>").append("\n\n<b>Steps Completed Before Pull request creation:</b>");
+            pipelineActivitiesList.forEach(
+                    activity -> {
+                        Integer stepIndex = activity.getStepIndex().intValue() + 1;
+                        desc.append("<br>").append("\nStep Name : " + activity.getStepName()).append("<br>").append("\nStep Index : " + stepIndex).append("<br>").append("\nMessage : " + activity.getMessage()).append("<br>").append("\nStatus : " + activity.getStatus()).append("<br>").append("\n\n");
+                    }
+            );
+        }
+        return desc;
     }
 
     public List<PipelineActivities> getPipelineActivities(GitGatewayRequest request) throws IOException {
