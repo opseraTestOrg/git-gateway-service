@@ -223,7 +223,7 @@ public class GitHelper {
 
     private StringBuilder getDescriptionWithPipelineDetailsForGit(GitGatewayRequest request) throws IOException {
         Pipelines pipeline = configCollector.getPipelineDetails(request);//to get pipeline Name
-        String pipelineInfo = "<b>Pipeline Information</b> : <br>\n\n Name : " + pipeline.getName().concat("<br>\n Run Count :" + request.getRunCount()).concat("<br>\n link : ").concat(String.format(OPSERA_PIPELINE_SUMMARY_URL, appConfig.getOpseraClientHost(), request.getPipelineId()));
+        String pipelineInfo = "\n<b>Pipeline Information</b> : <br>\n\n Name : " + pipeline.getName().concat("<br>\n Run Count :" + request.getRunCount()).concat("<br>\n link : ").concat(String.format(OPSERA_PIPELINE_SUMMARY_URL, appConfig.getOpseraClientHost(), request.getPipelineId()));
 
         List<PipelineActivities> pipelineActivitiesList = getPipelineActivities(request);
         log.info("activities {}", pipelineActivitiesList);
