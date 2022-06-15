@@ -203,7 +203,7 @@ public class GitHelper {
 
     private StringBuilder getDescriptionWithPipelineDetailsForBitBucket(GitGatewayRequest request) throws IOException {
         Pipelines pipeline = configCollector.getPipelineDetails(request);//to get pipeline Name
-        String pipelineInfo = "**Pipeline Information :** \n\n Name : " + pipeline.getName().concat("\n\n Run Count :" + request.getRunCount()).concat("\n\n link : ").concat(String.format(OPSERA_PIPELINE_SUMMARY_URL, appConfig.getOpseraClientHost(), request.getPipelineId()));
+        String pipelineInfo = "\n\n**Pipeline Information :** \n\n Name : " + pipeline.getName().concat("\n\n Run Count :" + request.getRunCount()).concat("\n\n link : ").concat(String.format(OPSERA_PIPELINE_SUMMARY_URL, appConfig.getOpseraClientHost(), request.getPipelineId()));
 
         List<PipelineActivities> pipelineActivitiesList = getPipelineActivities(request);
         log.info("activities {}", pipelineActivitiesList);
