@@ -22,7 +22,10 @@ public class Constants {
     public static final String SUCCESS = "Success";
     public static final String IN_PROGRESS = "In Progress";
     public static final String TASK_CONFIG_ENDPOINT = "/gittask/configuration";
-    public static final String OPSERA_PIPELINE_GITACTIONS_REQUEST = "";
+    public static final String OPSERA_PIPELINE_SUMMARY_URL = "https://%s/workflow/details/%s/summary";
+    public static final String PIPELINE_ACTIVITIES_URL="/v2/get/pipelineactivities";
+    public static final String PIPELINE_DETAILS="/v2/pipeline";
+
 
 
 }
