@@ -37,6 +37,8 @@ opsera:
     baseurl: ${opsera.config.baseurl}/api/github
   bitbucket:
     baseurl: ${opsera.config.baseurl}/api/bitbucket
+  client:
+    host: ${OPSERA_CLIENT_HOST}
 
 ---
 
