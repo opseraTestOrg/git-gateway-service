@@ -22,6 +22,9 @@ public class AppConfig {
     @Value("${pipeline.config.baseurl}")
     private String pipelineConfigBaseUrl;
 
+    @Value("${opsera.client.host}")
+    private String opseraClientHost;
+
     @Value("${retry.interval}")
     private int retryInterval;
 
