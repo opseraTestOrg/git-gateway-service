@@ -9,6 +9,9 @@ spring:
   application:
     name: git-gateway-service
     description: API integration for Git gateway service
+  mvc:
+    pathmatch:
+      matching-strategy: ant-path-matcher
   lifecycle:
     timeout-per-shutdown-phase: 2h
   task:
