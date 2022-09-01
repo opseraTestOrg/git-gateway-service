@@ -1,10 +1,10 @@
-FROM gradle:6.9-jdk8 AS build
+FROM gradle:6.9-jdk11 AS build
 ENV DOCKER_ENV=dev
 COPY --chown=gradle:gradle . /home/gradle/src
 WORKDIR /home/gradle/src
 RUN gradle clean build --no-daemon
 
-FROM openjdk:8-jre-slim
+FROM eclipse-temurin:11-jre
 RUN apt-get update && apt-get install -y curl dnsutils iputils-ping
 RUN mkdir -p /apps/OpsERA/components/git-gateway-service
 COPY --from=build /home/gradle/src/build/libs/*.jar /apps/OpsERA/components/git-gateway-service/git-gateway-service.jar
