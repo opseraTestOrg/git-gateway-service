@@ -40,6 +40,8 @@ opsera:
     baseurl: ${opsera.config.baseurl}/api/github
   bitbucket:
     baseurl: ${opsera.config.baseurl}/api/bitbucket
+  azure:
+    baseurl: ${opsera.config.baseurl}/api/azure
   client:
     host: ${OPSERA_CLIENT_HOST}
 

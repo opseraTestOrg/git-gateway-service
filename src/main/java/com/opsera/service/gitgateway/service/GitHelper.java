@@ -1,6 +1,7 @@
 package com.opsera.service.gitgateway.service;
 
 
+import static com.opsera.service.gitgateway.resources.Constants.AZURE;
 import static com.opsera.service.gitgateway.resources.Constants.BITBUCKET;
 import static com.opsera.service.gitgateway.resources.Constants.CREATE_PULL_REQUEST;
 import static com.opsera.service.gitgateway.resources.Constants.CREATE_TAG_REQUEST;
@@ -81,6 +82,9 @@ public class GitHelper {
             case BITBUCKET:
                 url = appConfig.getBitBucketBaseUrl();
                 break;
+            case AZURE:
+                url = appConfig.getAzureBaseUrl();
+                break;
             default:
                 break;
         }
@@ -94,6 +98,10 @@ public class GitHelper {
                 .description(request.getDescription())
                 .reviewers(config.getPrReviewers())
                 .build();
+        if(AZURE.equalsIgnoreCase(config.getService())){
+            gitIntegratorRequest.setProjectId(config.getProjectId());
+            gitIntegratorRequest.setRepoId(config.getRepoId());
+        }
         return gitIntegratorRequest;
 
     }
