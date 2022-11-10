@@ -44,10 +44,6 @@ public class AppConfig {
      * 
      * @return
      */
-    @Bean
-    public ObjectMapper getObjectMapper() {
-        return new ObjectMapper();
-    }
 
     @Bean
     public Gson getGson(){
