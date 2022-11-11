@@ -162,18 +162,11 @@ public class GitHelper {
                 throw new ServiceException(errorMsg);
 
             }
-            String errorMsg = new StringBuilder("Error while creating tag  :").append(e.getMessage()).toString();
-            throw new ServiceException(errorMsg);
-
+            throw new ServiceException("Tag creation Failed");
         }catch (Exception e) {
-            gitGatewayResponse.setStatus(FAILED);
-            gitGatewayResponse.setMessage("tag creation request failed");
-            log.error("tag creation request failed due to",e);
-            String errorMsg = new StringBuilder("Error while creating tag  :").append(e.getMessage()).toString();
-            throw new ServiceException(errorMsg);
-
+            log.error("Tag creation failed due to ", e);
+            throw new ServiceException("Tag creation Failed");
         }
-
         return gitGatewayResponse;
     }
 
@@ -222,17 +215,12 @@ public class GitHelper {
                 throw new ServiceException(errorMsg);
 
             }
-            String errorMsg = new StringBuilder("Error while creating Pull request  :").append(e.getMessage()).toString();
-            throw new ServiceException(errorMsg);
-
+            throw new ServiceException("Pull Request creation Failed");
         }catch (Exception e) {
-            gitGatewayResponse.setStatus(FAILED);
-            gitGatewayResponse.setMessage("Pull request creation failed");
             log.error("Pull request failed", e);
-            String errorMsg = new StringBuilder("Error while creating pull :").append(e.getMessage()).toString();
-            throw new ServiceException(errorMsg);
+            throw new ServiceException("Pull Request creation Failed");
         }
-        log.info("Successfully created Pull request ");
+        log.info("Successfully created Pull request");
         return gitGatewayResponse;
     }
 
