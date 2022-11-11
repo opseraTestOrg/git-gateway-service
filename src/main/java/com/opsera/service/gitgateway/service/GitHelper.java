@@ -17,6 +17,7 @@ import static com.opsera.service.gitgateway.resources.Constants.YYYY_MM_DD;
 import static com.opsera.service.gitgateway.resources.Constants.YYYY_MM_DD_HH_MM_SS;
 import com.google.gson.Gson;
 import com.opsera.core.enums.KafkaResponseTopics;
+import com.opsera.core.exception.ServiceErrorResponse;
 import com.opsera.core.exception.ServiceException;
 import com.opsera.core.rest.RestTemplateHelper;
 import com.opsera.service.gitgateway.config.AppConfig;
@@ -32,6 +33,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -150,15 +153,20 @@ public class GitHelper {
                 log.info("Tag creation failed due to : {}",gitResponse.getMessage());
             }
 
-        } catch (Exception e) {
-            gitGatewayResponse.setStatus(FAILED);
-            gitGatewayResponse.setMessage("tag creation request failed");
-            log.error("tag creation request failed due to",e);
-            String errorMsg = new StringBuilder("Error while creating tag  :").append(e.getMessage()).toString();
-            throw new ServiceException(errorMsg);
+        } catch (HttpClientErrorException | HttpServerErrorException e) {
+            log.error("Tag creation failed due to ", e);
+            String responseBodyAsString = e.getResponseBodyAsString();
+            if (StringUtils.isNotEmpty(responseBodyAsString)) {
+                ServiceErrorResponse errorResponse = gson.fromJson(responseBodyAsString, ServiceErrorResponse.class);
+                String errorMsg = new StringBuilder("Error while creating tag  :").append(errorResponse.getMessage()).toString();
+                throw new ServiceException(errorMsg);
 
+            }
+            throw new ServiceException("Tag creation Failed");
+        }catch (Exception e) {
+            log.error("Tag creation failed due to ", e);
+            throw new ServiceException("Tag creation Failed");
         }
-
         return gitGatewayResponse;
     }
 
@@ -198,14 +206,21 @@ public class GitHelper {
                 gitGatewayResponse.setMessage(gitResponse.getMessage());
 
             }
-        } catch (Exception e) {
-            gitGatewayResponse.setStatus(FAILED);
-            gitGatewayResponse.setMessage("Pull request creation failed");
+        } catch (HttpClientErrorException | HttpServerErrorException e) {
+            log.error("Pull request creation failed due to ", e);
+            String responseBodyAsString = e.getResponseBodyAsString();
+            if (StringUtils.isNotEmpty(responseBodyAsString)) {
+                ServiceErrorResponse errorResponse = gson.fromJson(responseBodyAsString, ServiceErrorResponse.class);
+                String errorMsg = new StringBuilder("Error while creating Pull Request  :").append(errorResponse.getMessage()).toString();
+                throw new ServiceException(errorMsg);
+
+            }
+            throw new ServiceException("Pull Request creation Failed");
+        }catch (Exception e) {
             log.error("Pull request failed", e);
-            String errorMsg = new StringBuilder("Error while creating pull :").append(e.getMessage()).toString();
-            throw new ServiceException(errorMsg);
+            throw new ServiceException("Pull Request creation Failed");
         }
-        log.info("Successfully created Pull request ");
+        log.info("Successfully created Pull request");
         return gitGatewayResponse;
     }
 
