@@ -10,6 +10,7 @@ import java.util.List;
 public class GitIntegratorRequest {
     private String customerId;
     private String projectId;
+    private String repoId;
     private String gitToolId;
     private String repository;
     private String gitBranch;

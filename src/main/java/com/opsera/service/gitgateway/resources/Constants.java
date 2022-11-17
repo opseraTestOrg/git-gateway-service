@@ -7,6 +7,7 @@ public class Constants {
     public static final String GITHUB = "github";
     public static final String GITLAB = "gitlab";
     public static final String BITBUCKET = "bitbucket";
+    public static final String AZURE = "azure-devops";
     public static final String PULL = "create-pull-request";
     public static final String TAG = "add-tag";
     public static final String CREATE_PULL_REQUEST = "/pullRequest";

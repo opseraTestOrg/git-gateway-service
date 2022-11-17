@@ -37,15 +37,13 @@ public class AppConfig {
     private String gitLabBaseUrl;
     @Value("${opsera.bitbucket.baseurl}")
     private String bitBucketBaseUrl;
+    @Value("${opsera.azure.baseurl}")
+    private String azureBaseUrl;
     /**
      * Create Bean for ObjectMapper
      * 
      * @return
      */
-    @Bean
-    public ObjectMapper getObjectMapper() {
-        return new ObjectMapper();
-    }
 
     @Bean
     public Gson getGson(){
