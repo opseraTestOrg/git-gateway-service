@@ -9,6 +9,9 @@ spring:
   application:
     name: git-gateway-service
     description: API integration for Git gateway service
+  mvc:
+    pathmatch:
+      matching-strategy: ant-path-matcher
   lifecycle:
     timeout-per-shutdown-phase: 2h
   task:
@@ -37,6 +40,10 @@ opsera:
     baseurl: ${opsera.config.baseurl}/api/github
   bitbucket:
     baseurl: ${opsera.config.baseurl}/api/bitbucket
+  azure:
+    baseurl: ${opsera.config.baseurl}/api/azure
+  client:
+    host: ${OPSERA_CLIENT_HOST}
 
 ---
 
