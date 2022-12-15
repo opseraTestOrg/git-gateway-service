@@ -26,5 +26,4 @@ public class Configuration implements Serializable {
     private String tag;
     private String service;
     private String repoId;
-    private List<Reviewer> prReviewers;
 }
