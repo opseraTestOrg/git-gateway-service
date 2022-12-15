@@ -1,15 +1,18 @@
 package com.opsera.service.gitgateway.service;
 
+import static com.opsera.service.gitgateway.resources.Constants.PIPELINE_ACTIVITIES_URL;
+import static com.opsera.service.gitgateway.resources.Constants.PIPELINE_DETAILS;
 import static com.opsera.service.gitgateway.resources.Constants.TASK_CONFIG_ENDPOINT;
 import static com.opsera.service.gitgateway.resources.Constants.TOOLS_CONFIG_URL;
 import com.opsera.core.rest.RestTemplateHelper;
 import com.opsera.service.gitgateway.config.AppConfig;
 import com.opsera.service.gitgateway.resources.Configuration;
 import com.opsera.service.gitgateway.resources.GitGatewayRequest;
+import com.opsera.service.gitgateway.resources.Pipelines;
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -36,6 +39,14 @@ public class ConfigCollector {
         return restTemplateHelper.postForEntity(Configuration.class, url, request);
     }
 
+    public Pipelines getPipelineDetails(GitGatewayRequest request) throws IOException {
+
+        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromHttpUrl(appConfig.getPipelineConfigBaseUrl()).path(PIPELINE_DETAILS).queryParam("pipelineId", request.getPipelineId())
+                .queryParam("customerId", request.getCustomerId());
+        return restTemplateHelper.getForEntity(Pipelines.class, uriBuilder.toUriString());
+
+    }
+
     public Configuration getTaskConfiguration(String customerId, String taskId) throws Exception {
         log.info("Getting the Git task Configuration for gitTask Id {}, customer Id {}", taskId, customerId);
         GitGatewayRequest request = new GitGatewayRequest();
@@ -49,6 +60,21 @@ public class ConfigCollector {
         } else {
             throw new Exception(String.format("Git Task configuration details not found for taskId: %s, customer: %s", taskId, customerId));
         }
+
+    }
+
+    public String getPipelineActivities(GitGatewayRequest request) throws IOException {
+        GitGatewayRequest pipelineActivitiesRequest = new GitGatewayRequest();
+        pipelineActivitiesRequest.setPipelineId(request.getPipelineId());
+        pipelineActivitiesRequest.setCustomerId(request.getCustomerId());
+        pipelineActivitiesRequest.setRunCount(request.getRunCount());
+        String url = appConfig.getPipelineConfigBaseUrl() + PIPELINE_ACTIVITIES_URL;
+        try {
+            return restTemplateHelper.postForEntity(String.class, url, request);
+        } catch (Exception ex) {
+            log.error("Pipeline Activities not available due to :", ex);
+        }
+        return "";
 
     }
 
